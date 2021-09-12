@@ -17,42 +17,41 @@ var Gameboard = (function(){
         switch (true) {
             case (!!board[0] && board[0] === board[1] && board[0] === board[2]):
                 symbol = board[0]; 
-                //console.log("1");
                 break;
             case (!!board[3] && board[3] === board[4] && board[3] === board[5]):
                 symbol = board[3];
-                //console.log("2");
                 break;
             case (!!board[6] && board[6] === board[7] && board[6] === board[8]):
                 symbol = board[6];
-                //console.log("3");
                 break;
             case (!!board[0] && board[0] === board[3] && board[0] === board[6]):
                 symbol = board[0];
-                //console.log("4");
                 break;
             case (!!board[1] && board[1] === board[4] && board[1] === board[7]):
                 symbol = board[1];
-                //console.log("5");
                 break;
             case (!!board[2] && board[2] === board[5] && board[2] === board[8]):
                 symbol = board[2];
-                //console.log("6");
                 break;
             case (!!board[4] && board[4] === board[0] && board[4] === board[8]):
                 symbol = board[4];
-                //console.log("7");
                 break;
             case (!!board[4] && board[4] === board[6] && board[4] === board[2]):
                 symbol = board[4];
-                //console.log("8");
                 break;
         }
         return symbol;
     }
     
-    const endRound = (winner) => {
-        alert(`The winner is ${winner}!`);
+    const endRound = () => {
+        if (!Gameboard.board.includes(null) && !Gameboard.checkWinner()) {
+            alert(`It's a draw!`);
+            Gameboard.resetBoard();
+        } else if (!Gameboard.checkWinner()){
+            return;
+        } else if (Gameboard.checkWinner()) {
+            alert(`The winner is ${Gameboard.checkWinner()}!`);
+        }
         Gameboard.resetBoard();
     }
 
@@ -95,19 +94,20 @@ var dom = (function(){
     }
     
     cells.forEach(cell => cell.addEventListener("click",function(){
-        // after every draw, check for a winner
         index = Array.prototype.indexOf.call(cells, cell);
+        if (Gameboard.board[index]) return; // don't pick same cell!
         player1.drawSymbol(index);
         if(Gameboard.checkWinner()) {
-            Gameboard.endRound(Gameboard.checkWinner());
+            Gameboard.endRound();
             return;
         }
         disableInput(true);
         setTimeout(function(){
             player2.chooseRandom(); 
             disableInput(false);
-            if(Gameboard.checkWinner()) Gameboard.endRound(Gameboard.checkWinner());
+            Gameboard.endRound();
         }, 500);
+        
     }));
 
     let resetBtn = document.getElementById("reset-button");
