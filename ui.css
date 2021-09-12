@@ -1,0 +1,11 @@
+#board {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+}
