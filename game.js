@@ -4,14 +4,27 @@ var Gameboard = (function(){
                 null,null,null,
                 null,null,null];
 
-    const resetBoard = () => {
+    let cells = document.querySelectorAll(".cell");
+
+    let _disableInput = (bool) => {
+        cells.forEach(cell => cell.disabled = bool);
+    }
+
+    const _resetBoard = () => {
         for (let i = 0; i < board.length; i++) {
             board[i] = null;
         }
-        dom.cells.forEach(cell => cell.innerHTML = "");
+        cells.forEach(cell => cell.innerHTML = "");
+        if (player2.getSymbol() === "X") {
+            _disableInput(true);
+            setTimeout(function(){
+                player2.chooseRandom(); 
+                _disableInput(false);
+            }, 500);
+        }
     }
 
-    const checkWinner = () => {
+    const _checkWinner = () => {
         // returns victor if there's a 3 in a row
         let symbol;
         switch (true) {
@@ -43,34 +56,68 @@ var Gameboard = (function(){
         return symbol;
     }
     
-    const endRound = () => {
-        if (!Gameboard.board.includes(null) && !Gameboard.checkWinner()) {
+    const _endRound = () => {
+        if (!board.includes(null) && !_checkWinner()) {
             alert(`It's a draw!`);
-            Gameboard.resetBoard();
-        } else if (!Gameboard.checkWinner()){
+            _resetBoard();
+        } else if (!_checkWinner()){
             return;
-        } else if (Gameboard.checkWinner()) {
-            alert(`The winner is ${Gameboard.checkWinner()}!`);
+        } else if (_checkWinner()) {
+            alert(`The winner is ${_checkWinner()}!`);
         }
-        Gameboard.resetBoard();
+        _resetBoard();
     }
+    
+    cells.forEach(cell => cell.addEventListener("click",function(){
+        index = Array.prototype.indexOf.call(cells, cell);
+        if (board[index]) return; // don't pick same cell!
+        player1.drawSymbol(index);
+        if(_checkWinner()) {
+            _endRound();
+            return;
+        }
+        _disableInput(true);
+        setTimeout(function(){
+            player2.chooseRandom(); 
+            _disableInput(false);
+            _endRound();
+        }, 500);
+        
+    }));
 
-    return {
-        board, resetBoard, checkWinner, endRound
-    }
+    let resetBtn = document.getElementById("reset-button");
+    resetBtn.addEventListener("click", function(){
+        _resetBoard();
+    });
+
+    let selectXBtn = document.getElementById("select-x");
+    selectXBtn.addEventListener("click", function(){
+        player1.setSymbol("X");
+        player2.setSymbol("O");
+        _resetBoard();
+    });
+
+    let selectOBtn = document.getElementById("select-o");
+    selectOBtn.addEventListener("click", function(){
+        player1.setSymbol("O");
+        player2.setSymbol("X");
+        _resetBoard();
+    });
+    
+    return { board, cells }
 })();
 
 var Player = function(name, symbol){
-    let setSymbol = (newSymbol) => {
-        // setting properties directly won't work for whatever reason
-        symbol = newSymbol;
-    }
-    let drawSymbol = (cell) => {
+    const setName = (newName) => name = newName;
+    const getName = () => name;
+    const setSymbol = (newSymbol) => symbol = newSymbol;
+    const getSymbol = () => symbol;
+    const drawSymbol = (cell) => {
         if (Gameboard.board[cell]) return;
         Gameboard.board[cell] = symbol;
-        dom.cells[cell].innerHTML = symbol;
+        Gameboard.cells[cell].innerHTML = symbol;
     }
-    let chooseRandom = () => {
+    const chooseRandom = () => {
         // check if board is full
         if (!Gameboard.board.includes(null)) return;
         var cell = Math.floor(Math.random() * 9);
@@ -79,57 +126,10 @@ var Player = function(name, symbol){
             cell = Math.floor(Math.random() * 9);
         }
         Gameboard.board[cell] = symbol;
-        dom.cells[cell].innerHTML = symbol;
+        Gameboard.cells[cell].innerHTML = symbol;
     }
-    return {
-        name, setSymbol, drawSymbol, chooseRandom,
-    }
+    return { setName, getName, setSymbol, getSymbol, drawSymbol, chooseRandom }
 }
-
-var dom = (function(){
-    let cells = document.querySelectorAll(".cell");
-
-    let disableInput = (bool) => {
-        cells.forEach(cell => cell.disabled = bool);
-    }
-    
-    cells.forEach(cell => cell.addEventListener("click",function(){
-        index = Array.prototype.indexOf.call(cells, cell);
-        if (Gameboard.board[index]) return; // don't pick same cell!
-        player1.drawSymbol(index);
-        if(Gameboard.checkWinner()) {
-            Gameboard.endRound();
-            return;
-        }
-        disableInput(true);
-        setTimeout(function(){
-            player2.chooseRandom(); 
-            disableInput(false);
-            Gameboard.endRound();
-        }, 500);
-        
-    }));
-
-    let resetBtn = document.getElementById("reset-button");
-    resetBtn.addEventListener("click", function(){
-        Gameboard.resetBoard();
-    });
-
-    let selectXBtn = document.getElementById("select-x");
-    selectXBtn.addEventListener("click", function(){
-        player1.setSymbol("X");
-        player2.setSymbol("O");
-        Gameboard.resetBoard();
-    });
-
-    let selectOBtn = document.getElementById("select-o");
-    selectOBtn.addEventListener("click", function(){
-        player1.setSymbol("O");
-        player2.setSymbol("X");
-        Gameboard.resetBoard();
-    });
-    return { cells }
-})();
 
 // default is X
 let player1 = Player("Player 1", "X");

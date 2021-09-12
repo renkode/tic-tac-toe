@@ -10,21 +10,23 @@ body {
 }
 
 #board {
-    width: 500px;
+    width: 251px;
     display: flex;
     flex-direction: column;
     justify-items: center;
     align-items: center;
     gap: 6px;
+    background-color: gray;
 }
 
 .cell {
+    box-sizing: border-box;
     font-size: 50px;
-    padding: 0px;
-    margin: 0px;
     width: 80px;
     height: 80px;
     vertical-align: top;
+    background-color: white;
+    border: 0px;
 }
 
 .actions {
