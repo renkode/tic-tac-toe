@@ -1,8 +1,16 @@
+body {
+    margin-top: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #board {
     width: 500px;
     display: flex;
     flex-direction: column;
     justify-items: center;
+    align-items: center;
     gap: 6px;
 }
 
@@ -15,6 +23,9 @@
     vertical-align: top;
 }
 
-#reset-board {
+.actions {
     margin-top: 10px;
+}
+
+#reset-board {
 }

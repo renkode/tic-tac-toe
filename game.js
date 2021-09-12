@@ -11,7 +11,7 @@ var Gameboard = (function(){
         dom.cells.forEach(cell => cell.innerHTML = "");
     }
 
-    const checkVictory = () => {
+    const checkWinner = () => {
         // returns victor if there's a 3 in a row
         let symbol;
         switch (true) {
@@ -50,8 +50,14 @@ var Gameboard = (function(){
         }
         return symbol;
     }
+    
+    const endRound = (winner) => {
+        alert(`The winner is ${winner}!`);
+        Gameboard.resetBoard();
+    }
+
     return {
-        board, resetBoard, checkVictory,
+        board, resetBoard, checkWinner, endRound
     }
 })();
 
@@ -64,7 +70,6 @@ var Player = function(name, symbol){
         if (Gameboard.board[cell]) return;
         Gameboard.board[cell] = symbol;
         dom.cells[cell].innerHTML = symbol;
-        Gameboard.checkVictory();
     }
     let chooseRandom = () => {
         // check if board is full
@@ -76,7 +81,6 @@ var Player = function(name, symbol){
         }
         Gameboard.board[cell] = symbol;
         dom.cells[cell].innerHTML = symbol;
-        Gameboard.checkVictory();
     }
     return {
         name, setSymbol, drawSymbol, chooseRandom,
@@ -85,10 +89,25 @@ var Player = function(name, symbol){
 
 var dom = (function(){
     let cells = document.querySelectorAll(".cell");
+
+    let disableInput = (bool) => {
+        cells.forEach(cell => cell.disabled = bool);
+    }
     
     cells.forEach(cell => cell.addEventListener("click",function(){
+        // after every draw, check for a winner
         index = Array.prototype.indexOf.call(cells, cell);
         player1.drawSymbol(index);
+        if(Gameboard.checkWinner()) {
+            Gameboard.endRound(Gameboard.checkWinner());
+            return;
+        }
+        disableInput(true);
+        setTimeout(function(){
+            player2.chooseRandom(); 
+            disableInput(false);
+            if(Gameboard.checkWinner()) Gameboard.endRound(Gameboard.checkWinner());
+        }, 500);
     }));
 
     let resetBtn = document.getElementById("reset-button");
@@ -110,10 +129,6 @@ var dom = (function(){
         Gameboard.resetBoard();
     });
     return { cells }
-})();
-
-var Controller = (function(){
-
 })();
 
 // default is X
