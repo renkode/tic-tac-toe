@@ -1,10 +1,45 @@
 var Gameboard = (function(){
-    // tbh it's easier to read as a 1d array over 2d
+    // tbh it's easier to read as a 1d array instead of 2d
     let board = [null,null,null,
                 null,null,null,
                 null,null,null];
 
     let cells = document.querySelectorAll(".cell");
+    // must wait for svg to load or else it returns null
+    setTimeout(function() {
+        let svgs = document.getElementById("svgs");
+        for (let i = 0; i < cells.length; i++) {
+            let svg = svgs.cloneNode();
+            svg.id = `svg-${i}`;
+            cells[i].appendChild(svg);
+            _duplicateChildNodesToClone(svgs,svg);
+        }}, 300 );
+
+    const _duplicateChildNodesToClone = (parent, target) => {
+        NodeList.prototype.forEach = Array.prototype.forEach;
+        var children = parent.childNodes;
+        children.forEach(function(item){
+            var cln = item.cloneNode(true);
+            target.appendChild(cln);
+        });
+    };
+
+    const _drawAnimation = (symbol, index) => {
+        let cellSVG = document.getElementById(`svg-${index}`);
+        let circle = cellSVG.querySelector("circle");
+        let lines = cellSVG.querySelectorAll("line");
+        if (symbol === "O") {
+            circle.setAttribute("class", "path circle");
+            circle.setAttribute("visibility", "visible");
+        } else if (symbol === "X") {
+            lines[0].setAttribute("class", "path line");
+            lines[1].setAttribute("class", "path line2");
+            lines.forEach(line => {
+                line.setAttribute("visibility", "visible");
+            })
+        }
+        
+    }
 
     let _disableInput = (bool) => {
         cells.forEach(cell => cell.disabled = bool);
@@ -14,13 +49,18 @@ var Gameboard = (function(){
         for (let i = 0; i < board.length; i++) {
             board[i] = null;
         }
-        cells.forEach(cell => cell.innerHTML = "");
+        //cells.forEach(cell => cell.innerHTML = "");
+
+        let paths = document.querySelectorAll(".path");
+        paths.forEach(path => {
+            path.setAttribute("class", "");
+            path.setAttribute("visibility", "hidden");
+        });
+
         if (player2.getSymbol() === "X") {
-            _disableInput(true);
             setTimeout(function(){
                 player2.chooseRandom(); 
-                _disableInput(false);
-            }, 500);
+            }, 200);
         }
     }
 
@@ -72,17 +112,23 @@ var Gameboard = (function(){
         index = Array.prototype.indexOf.call(cells, cell);
         if (board[index]) return; // don't pick same cell!
         player1.drawSymbol(index);
+        _disableInput(true);
+        setTimeout(function(){_disableInput(false);}, 1500);
+        // end round after animation ends
+        setTimeout(function(){
+            if(_checkWinner()) {
+                _endRound();
+                return;
+            }
+        }, 800);
+        // cancel player 2's selection
         if(_checkWinner()) {
-            _endRound();
             return;
         }
-        _disableInput(true);
         setTimeout(function(){
             player2.chooseRandom(); 
-            _disableInput(false);
             _endRound();
-        }, 500);
-        
+        }, 1100);
     }));
 
     let resetBtn = document.getElementById("reset-button");
@@ -103,34 +149,34 @@ var Gameboard = (function(){
         player2.setSymbol("X");
         _resetBoard();
     });
-    
-    return { board, cells }
-})();
 
-var Player = function(name, symbol){
-    const setName = (newName) => name = newName;
-    const getName = () => name;
-    const setSymbol = (newSymbol) => symbol = newSymbol;
-    const getSymbol = () => symbol;
-    const drawSymbol = (cell) => {
-        if (Gameboard.board[cell]) return;
-        Gameboard.board[cell] = symbol;
-        Gameboard.cells[cell].innerHTML = symbol;
-    }
-    const chooseRandom = () => {
-        // check if board is full
-        if (!Gameboard.board.includes(null)) return;
-        var cell = Math.floor(Math.random() * 9);
-        // spot must be empty
-        while (Gameboard.board[cell] !== null) {
-            cell = Math.floor(Math.random() * 9);
+
+    // can place the following outside of Gameboard
+    var Player = function(name, symbol){
+        const setName = (newName) => name = newName;
+        const getName = () => name;
+        const setSymbol = (newSymbol) => symbol = newSymbol;
+        const getSymbol = () => symbol;
+        const drawSymbol = (cell) => {
+            if (board[cell]) return;
+            board[cell] = symbol;
+            _drawAnimation(symbol, index);
         }
-        Gameboard.board[cell] = symbol;
-        Gameboard.cells[cell].innerHTML = symbol;
+        const chooseRandom = () => {
+            // check if board is full
+            if (!board.includes(null)) return;
+            var cell = Math.floor(Math.random() * 9);
+            // spot must be empty
+            while (board[cell] !== null) {
+                cell = Math.floor(Math.random() * 9);
+            }
+            board[cell] = symbol;
+            _drawAnimation(symbol,cell);
+        }
+        return { setName, getName, setSymbol, getSymbol, drawSymbol, chooseRandom }
     }
-    return { setName, getName, setSymbol, getSymbol, drawSymbol, chooseRandom }
-}
 
-// default is X
-let player1 = Player("Player 1", "X");
-let player2 = Player("Player 2", "O");
+    let player1 = Player("Player 1", "X");
+    let player2 = Player("Player 2", "O");
+
+})();
