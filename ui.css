@@ -111,3 +111,41 @@ svg {
     }
   }
 
+@media only screen and (max-device-width: 800px) {
+  html {
+  }
+  body {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+  }
+
+  h1 {
+    font-size: 8vh;
+  }
+
+  #board {
+    width: 90vw;
+    height: 90vw;
+  }
+
+  .row {
+    width: 100%;
+    height: 33%;
+  }
+
+  .cell {
+    width: 33%;
+    height: 100%;
+  }
+
+  .actions {
+    margin-top: 10%;
+  }
+
+  #reset-button, .choice {
+    width: 30vw;
+    height: 8vh;
+    font-size: 4vh;
+  }
+}
