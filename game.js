@@ -5,6 +5,8 @@ var Gameboard = (function(){
                 null,null,null];
 
     let cells = document.querySelectorAll(".cell");
+    let timeOutTarget;
+
     // must wait for svg to load or else it returns null
     setTimeout(function() {
         let svgs = document.getElementById("svgs");
@@ -46,10 +48,10 @@ var Gameboard = (function(){
     }
 
     const _resetBoard = () => {
+        clearTimeout(timeOutTarget);
         for (let i = 0; i < board.length; i++) {
             board[i] = null;
         }
-        //cells.forEach(cell => cell.innerHTML = "");
 
         let paths = document.querySelectorAll(".path");
         paths.forEach(path => {
@@ -125,9 +127,9 @@ var Gameboard = (function(){
         if(_checkWinner()) {
             return;
         }
-        setTimeout(function(){
+        timeOutTarget = setTimeout(function(){
             player2.chooseRandom(); 
-            _endRound();
+            setTimeout(_endRound(),800);
         }, 1100);
     }));
 
@@ -141,6 +143,8 @@ var Gameboard = (function(){
         player1.setSymbol("X");
         player2.setSymbol("O");
         _resetBoard();
+        selectXBtn.disabled = true;
+        selectOBtn.disabled = false;
     });
 
     let selectOBtn = document.getElementById("select-o");
@@ -148,6 +152,8 @@ var Gameboard = (function(){
         player1.setSymbol("O");
         player2.setSymbol("X");
         _resetBoard();
+        selectXBtn.disabled = false;
+        selectOBtn.disabled = true;
     });
 
 
@@ -178,5 +184,6 @@ var Gameboard = (function(){
 
     let player1 = Player("Player 1", "X");
     let player2 = Player("Player 2", "O");
-
+    selectXBtn.disabled = true;
+    return {board}
 })();

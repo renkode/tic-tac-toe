@@ -1,5 +1,5 @@
 html {
-    font-family: sans-serif;
+    font-family: Helvetica, sans-serif;
 }
 
 body {
@@ -38,7 +38,30 @@ body {
     margin-top: 10px;
 }
 
-#reset-board {
+#reset-button {
+  color: white;
+  height: 30px;
+  width: 50px;
+  background-color: #ff5656;
+  border: 0px;
+  border-radius: 4px;
+}
+
+#reset-button:hover {
+  background-color: #e23030;
+}
+
+.choice {
+  height: 30px;
+  width: 30px;
+  background-color: white;
+  box-sizing: border-box;
+  border: 1px solid gray;
+  border-radius: 4px;
+}
+
+.choice:hover:enabled{
+  background-color: rgb(236, 236, 236);
 }
 
 svg {
@@ -87,4 +110,4 @@ svg {
       stroke-dashoffset: 900;
     }
   }
-  
+
