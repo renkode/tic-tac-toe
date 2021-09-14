@@ -40,7 +40,6 @@ var Gameboard = (function(){
                 line.setAttribute("visibility", "visible");
             })
         }
-        
     }
 
     let _disableInput = (bool) => {
@@ -101,7 +100,6 @@ var Gameboard = (function(){
     const _endRound = () => {
         if (!board.includes(null) && !_checkWinner()) {
             alert(`It's a draw!`);
-            _resetBoard();
         } else if (!_checkWinner()){
             return;
         } else if (_checkWinner()) {
@@ -155,7 +153,6 @@ var Gameboard = (function(){
         selectXBtn.disabled = false;
         selectOBtn.disabled = true;
     });
-
 
     // can place the following outside of Gameboard
     var Player = function(name, symbol){
